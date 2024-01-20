@@ -16,15 +16,18 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import { Link } from "react-router-dom";
+import Comment from "../Comment/Comment";
 
 let currentUserId = 3;
 function Recipe(props){
-    const {title, text, userName, userId, recipeId} = props;
+    const {title, text, userName, userId, recipeId, ingredients} = props;
     const [expanded, setExpanded] = React.useState(false);
+    const [showComment, setShowComment] = React.useState(false);
     const [liked, setLiked] = React.useState(false);
     const [likeList, setLikeList] = React.useState([]);
     const [likeCount, setLikeCount] = React.useState(likeList.length);
     const [likeId, setLikeId] = React.useState();
+    const [commentList, setCommentList] = React.useState([]);
 
     
 
@@ -51,6 +54,31 @@ const getLikes = () => {
     console.log("hata");
   }    
 }
+
+
+const getComments = () => {
+  if (recipeId !== undefined && recipeId !== null) {
+    fetch(`/comment/getAllComments?recipeId=${recipeId}`)
+      .then(response => response.json())
+      .then(
+          (result) => {
+              setCommentList(result);
+              console.log(result);
+          },
+          (error) => {
+              // setError(error);
+              console.log(error);
+          }
+      )
+  }else{
+    console.log(recipeId);
+    console.log("hata");
+  }    
+}
+
+useEffect(() =>{
+  getComments();
+})
 
 useEffect(() =>{
   setLikeCount(likeList.length);
@@ -147,8 +175,18 @@ try {
         }),
       }));
 
+
   const handleExpandClick = () => {
+    if(showComment){
+      setShowComment(false);
+    }
     setExpanded(!expanded);};
+
+    const handleCommentClick = () => {
+      if(expanded){
+        setExpanded(false);
+      }
+      setShowComment(!showComment);};
 
 
 
@@ -179,7 +217,10 @@ try {
           alt="Paella dish"
         /> */}
         <CardContent>
-          <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary">
+            {ingredients.join(",")}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" style={{marginTop:10}}>
             {text}
           </Typography>
         </CardContent>
@@ -189,9 +230,11 @@ try {
             <div style={{fontSize:22, marginLeft:2, marginRight:2, marginTop:2, fontWeight:"bold", ...(likeCount===0 ? null : {color:"#F4CE14"})}}>{likeCount}</div>
           </IconButton>
           
-          <IconButton aria-label="comment">
+          
+          <IconButton aria-label="comments" onClick={handleCommentClick}>
             <ModeCommentOutlinedIcon/>
-          </IconButton>
+            </IconButton>
+          
           
           <ExpandMore
             expand={expanded}
@@ -229,6 +272,17 @@ try {
             <Typography>
               Set aside off of the heat to let rest for 10 minutes, and then serve.
             </Typography>
+          </CardContent>
+        </Collapse>
+
+        <Collapse in={showComment} timeout="auto" unmountOnExit>
+        <CardContent>
+        {commentList.map(comment => (
+                    
+                    <Comment text={comment.text} userId = {comment.userId} userName={comment.userName}></Comment>
+                     
+                ))}
+        
           </CardContent>
         </Collapse>
       </Card>
