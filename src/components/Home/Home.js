@@ -25,6 +25,8 @@ function Home(){
         )
     }, [])
 
+
+
     if(error){
        return <div>Error!</div>;
     }else if(!isLoaded){
@@ -34,7 +36,8 @@ function Home(){
             <div> 
                 <Container fixed style={{display:"flex", flexWrap:"wrap", justifyContent:"center", alignItems:"center", marginTop:69, backgroundColor:"blue", minHeight:"100vh"}}>
                 {recipeList.map(recipe => (
-                    <Recipe title = {recipe.title} text = {recipe.text} userName = {recipe.userName} userId = {recipe.userId}></Recipe>
+                    
+                    <Recipe recipeId = {recipe.recipeId} title = {recipe.title} text = {recipe.text} userName = {recipe.userName} userId = {recipe.userId}></Recipe>
                      
                 ))}
             </Container>

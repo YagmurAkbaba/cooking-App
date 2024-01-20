@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -17,10 +17,123 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import { Link } from "react-router-dom";
 
+let currentUserId = 3;
 function Recipe(props){
-    const {title, text, userName, userId} = props;
+    const {title, text, userName, userId, recipeId} = props;
     const [expanded, setExpanded] = React.useState(false);
     const [liked, setLiked] = React.useState(false);
+    const [likeList, setLikeList] = React.useState([]);
+    const [likeCount, setLikeCount] = React.useState(likeList.length);
+    const [likeId, setLikeId] = React.useState();
+
+    
+
+   useEffect(() => {
+    getLikes();
+}, []); 
+
+const getLikes = () => {
+  if (recipeId !== undefined && recipeId !== null) {
+    fetch(`/like/getAllLikes?recipeId=${recipeId}`)
+      .then(response => response.json())
+      .then(
+          (result) => {
+              setLikeList(result);
+              console.log(result);
+          },
+          (error) => {
+              // setError(error);
+              console.log(error);
+          }
+      )
+  }else{
+    console.log(recipeId);
+    console.log("hata");
+  }    
+}
+
+useEffect(() =>{
+  setLikeCount(likeList.length);
+  if (likeList.length > 0) {
+    likeList.forEach((like) => {
+        if(like.userId === currentUserId){
+          setLiked(true);
+          setLikeId(like.likeId);
+          setLikeId(like.likeId);
+        }
+    });
+  }
+}, [likeList]);
+
+
+const handleLike = async() => {
+  
+  try {
+      if (liked && likeId) {
+          await deleteLike(likeId);
+          setLikeCount((prevCount) => prevCount - 1);
+          setLiked(!liked);
+      } else {
+          await saveLike();
+          setLikeCount((prevCount) => prevCount + 1);
+          setLiked(!liked);
+          
+      }
+      getLikes();
+  } catch (error) {
+      console.error("Error handling like:", error);
+      // You might want to set an error state or provide feedback to the user
+  }
+    
+}; 
+
+const saveLike = async() =>{
+  try {
+    const response = await fetch("/like/createLike", {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({
+            recipeId: recipeId,
+            userId: currentUserId
+        }),
+    });
+
+    if (!response.ok) {
+
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log(result);
+
+} catch (error) {
+    console.error("Error saving like:", error);
+}
+
+}
+
+const deleteLike = async(likeId) =>{
+try {    
+  const response = await fetch(`/like/deleteLike/${likeId}`, {
+      method: "DELETE"
+  });
+
+  
+
+  if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+  console.log(response);
+  console.log("Like deleted successfully");
+} catch (error) {
+  console.error("Error deleting like:", error);
+  // Handle error if needed
+}
+
+}
+
+
+
 
 
     const ExpandMore = styled((props) => {
@@ -37,8 +150,9 @@ function Recipe(props){
   const handleExpandClick = () => {
     setExpanded(!expanded);};
 
-     const handleLike = () => {
-    setLiked(!liked);}; 
+
+
+
 
     return( 
         <Card sx={{ width: 600,  marginBottom: 1, marginTop:1}}>
@@ -72,7 +186,9 @@ function Recipe(props){
         <CardActions disableSpacing>
           <IconButton onClick={handleLike} aria-label="add to favorites">
             <FavoriteIcon style={liked ? {color:"#F4CE14"} : null}/>
+            <div style={{fontSize:22, marginLeft:2, marginRight:2, marginTop:2, fontWeight:"bold", ...(likeCount===0 ? null : {color:"#F4CE14"})}}>{likeCount}</div>
           </IconButton>
+          
           <IconButton aria-label="comment">
             <ModeCommentOutlinedIcon/>
           </IconButton>
