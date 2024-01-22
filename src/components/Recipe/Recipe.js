@@ -17,6 +17,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ModeCommentOutlinedIcon from '@mui/icons-material/ModeCommentOutlined';
 import { Link } from "react-router-dom";
 import Comment from "../Comment/Comment";
+import CommentCreator from "../Comment/CommentCreator";
 
 let currentUserId = 3;
 function Recipe(props){
@@ -175,7 +176,6 @@ try {
         }),
       }));
 
-
   const handleExpandClick = () => {
     if(showComment){
       setShowComment(false);
@@ -234,8 +234,7 @@ try {
           <IconButton aria-label="comments" onClick={handleCommentClick}>
             <ModeCommentOutlinedIcon/>
             </IconButton>
-          
-          
+            
           <ExpandMore
             expand={expanded}
             onClick={handleExpandClick}
@@ -277,6 +276,7 @@ try {
 
         <Collapse in={showComment} timeout="auto" unmountOnExit>
         <CardContent>
+          <CommentCreator getComments={getComments} recipeId={recipeId}></CommentCreator>
         {commentList.map(comment => (
                     
                     <Comment text={comment.text} userId = {comment.userId} userName={comment.userName}></Comment>
