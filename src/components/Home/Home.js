@@ -6,7 +6,6 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import Alert from '@mui/material/Alert';
 import AlertTitle from "@mui/material/AlertTitle";
-import Comment from "../Comment/Comment";
 
 
 function Home(){
@@ -53,9 +52,9 @@ function Home(){
       }, [isAlert]);
 
     if(error){
-       return <div>Error!</div>;
+       return <div style={{marginTop:82}}>Error!</div>;
     }else if(!isLoaded){
-       return <div>Loading...</div>;
+       return <div style={{marginTop:82}}>Loading...</div>;
     }else{
         return (
             <div style={{backgroundColor:"#FBF9F1"}}> 

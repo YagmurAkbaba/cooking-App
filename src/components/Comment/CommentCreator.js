@@ -21,7 +21,7 @@ import { Link } from "react-router-dom";
 
 
 
-let currentUserId = 3;
+
 function CommentCreator(props){
     const {getComments, recipeId} =props;
     const [text, setText] = useState("");
@@ -41,7 +41,7 @@ function CommentCreator(props){
               method: "POST",
               headers: { "Content-type": "application/json" },
               body: JSON.stringify({
-                  userId: currentUserId,
+                  userId: localStorage.getItem("currentUser"),
                   recipeId:recipeId,
                   text: text,
               }),
@@ -72,9 +72,9 @@ function CommentCreator(props){
        <Card sx={{ width: "98%",  marginBottom: 1, marginTop:1, backgroundColor:"#FBF9F1"}}>
         <CardHeader style={{alignItems:"flex-start"}}
           avatar={
-            <Link to={`/user/getUserById/${currentUserId}`} style={{textDecoration:"none"}}>
+            <Link to={`/user/getUserById/${localStorage.getItem("currentUser")}`} style={{textDecoration:"none"}}>
             <Avatar sx={{ bgcolor: "#F2BE22" }} aria-label="recipe">
-              R
+            {!!localStorage.getItem("userName") ? localStorage.getItem("userName").charAt(0).toUpperCase() : "U"}
             </Avatar>
             </Link>
           }

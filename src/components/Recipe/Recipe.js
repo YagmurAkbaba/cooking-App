@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useCallback, useEffect} from "react";
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -19,7 +19,7 @@ import { Link } from "react-router-dom";
 import Comment from "../Comment/Comment";
 import CommentCreator from "../Comment/CommentCreator";
 
-let currentUserId = 3;
+
 function Recipe(props){
     const {title, text, userName, userId, recipeId, ingredients} = props;
     const [expanded, setExpanded] = React.useState(false);
@@ -32,11 +32,9 @@ function Recipe(props){
 
     
 
-   useEffect(() => {
-    getLikes();
-}, []); 
 
-const getLikes = () => {
+
+const getLikes = useCallback(() => {
   if (recipeId !== undefined && recipeId !== null) {
     fetch(`/like/getAllLikes?recipeId=${recipeId}`)
       .then(response => response.json())
@@ -54,10 +52,14 @@ const getLikes = () => {
     console.log(recipeId);
     console.log("hata");
   }    
-}
+},[recipeId]);
+
+useEffect(() => {
+  getLikes();
+}, [getLikes]); 
 
 
-const getComments = () => {
+const getComments = useCallback(() => {
   if (recipeId !== undefined && recipeId !== null) {
     fetch(`/comment/getAllComments?recipeId=${recipeId}`)
       .then(response => response.json())
@@ -75,17 +77,17 @@ const getComments = () => {
     console.log(recipeId);
     console.log("hata");
   }    
-}
+}, [recipeId]);
 
 useEffect(() =>{
   getComments();
-})
+},[getComments])
 
 useEffect(() =>{
   setLikeCount(likeList.length);
   if (likeList.length > 0) {
     likeList.forEach((like) => {
-        if(like.userId === currentUserId){
+        if(like.userId === localStorage.getItem("currentUser")){
           setLiked(true);
           setLikeId(like.likeId);
           setLikeId(like.likeId);
@@ -123,7 +125,7 @@ const saveLike = async() =>{
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({
             recipeId: recipeId,
-            userId: currentUserId
+            userId: localStorage.getItem("currentUser")
         }),
     });
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -13,15 +13,18 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import { useNavigate } from "react-router-dom";
 
-let userId = 3;
+
 const pages = ['Home'];
 const settings = ['Profile', 'Logout'];
 
-function Navbar(){
-    
+function Navbar({currentUserExists}){
+
+
     const [anchorElNav, setAnchorElNav] = React.useState(null);
         const [anchorElUser, setAnchorElUser] = React.useState(null);
+        const navigate = useNavigate();
 
         const handleOpenNavMenu = (event) => {
             setAnchorElNav(event.currentTarget);
@@ -34,7 +37,10 @@ function Navbar(){
             setAnchorElNav(null);
         };
 
-        const handleCloseUserMenu = () => {
+        const handleCloseUserMenu = (key) => {
+            if(key ==="Logout"){
+              handleLogout();
+            }
             setAnchorElUser(null);
         };
 
@@ -43,20 +49,26 @@ function Navbar(){
               case "Home":
                 return "/";
               default:
-                return "/";
+                return "/auth";
             }
           };
 
           const handleSettingsRouting = (setting) => {
             switch (setting) {
               case "Profile":
-                return `/user/getUserById/${userId}`;
+                return `/user/getUserById/${localStorage.getItem("currentUser")}`;
               case "Logout":
-                return "/";
+                return "/auth";
               default:
-                return "/";
+                return "/auth";
             }
           };
+
+          const handleLogout = () =>{
+            localStorage.removeItem("currentUser");
+            localStorage.removeItem("userName");
+            navigate("/auth")
+          }
 
 
     return(
@@ -68,7 +80,7 @@ function Navbar(){
               variant="h6"
               noWrap
               component="a"
-              href="#app-bar-with-responsive-menu"
+             // href="#app-bar-with-responsive-menu"
               sx={{
                 mr: 2,
                 display: { xs: 'none', md: 'flex' },
@@ -81,7 +93,9 @@ function Navbar(){
             >
               COOKIDEA
             </Typography>
-  
+              {currentUserExists && (
+
+              <>
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
               <IconButton
                 size="large"
@@ -122,12 +136,12 @@ function Navbar(){
                 ))}
               </Menu>
             </Box>
-            <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+            
             <Typography
               variant="h5"
               noWrap
               component="a"
-              href="#app-bar-with-responsive-menu"
+              // href="#app-bar-with-responsive-menu"
               sx={{
                 mr: 2,
                 display: { xs: 'flex', md: 'none' },
@@ -139,8 +153,9 @@ function Navbar(){
                 textDecoration: 'none',
               }}
             >
-              LOGO
+              COOKIDEA
             </Typography>
+            
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page) => (
                 <Button
@@ -159,7 +174,7 @@ function Navbar(){
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="#" />
+                  <Avatar> {!!localStorage.getItem("userName") ? localStorage.getItem("userName").charAt(0).toUpperCase() : "U"}</Avatar>
                 </IconButton>
               </Tooltip>
               <Menu
@@ -179,7 +194,7 @@ function Navbar(){
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                  <MenuItem key={setting} onClick={() =>handleCloseUserMenu(setting)}>
                     <Typography textAlign="center">
                         <Link to = {handleSettingsRouting(setting)} style={{ textDecoration: 'none', color: 'inherit' }}>{setting}</Link>
                         </Typography>
@@ -187,6 +202,8 @@ function Navbar(){
                 ))}
               </Menu>
             </Box>
+            </>
+              )}
           </Toolbar>
         </Container>
       </AppBar>

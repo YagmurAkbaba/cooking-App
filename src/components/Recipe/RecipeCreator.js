@@ -21,7 +21,7 @@ import { Link } from "react-router-dom";
 
 
 
-let currentUserId = 3;
+
 function RecipeCreator(props){
     const {getRecipes, setRecipeCreator,setIsAlert} =props;
     const [text, setText] = useState("");
@@ -47,7 +47,7 @@ function RecipeCreator(props){
               method: "POST",
               headers: { "Content-type": "application/json" },
               body: JSON.stringify({
-                  userId: currentUserId,
+                  userId: localStorage.getItem("currentUser"),
                   title: title,
                   text: text,
                   ingredients: ingredients
@@ -86,9 +86,9 @@ function RecipeCreator(props){
         <Card sx={{ width: 600,  marginBottom: 1, marginTop:1}}>
         <CardHeader
           avatar={
-            <Link to={`/user/getUserById/${currentUserId}`} style={{textDecoration:"none"}}>
+            <Link to={`/user/getUserById/${localStorage.getItem("currentUser")}`} style={{textDecoration:"none"}}>
             <Avatar sx={{ bgcolor: "#F2BE22" }} aria-label="recipe">
-             R
+            {!!localStorage.getItem("userName") ? localStorage.getItem("userName").charAt(0).toUpperCase() : "U"}
             </Avatar>
             </Link>
           }
